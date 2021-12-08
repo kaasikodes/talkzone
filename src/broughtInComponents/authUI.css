@@ -1,0 +1,53 @@
+.authUI {
+  width: 430px;
+  margin-top: 30px;
+  height: 300px;
+  max-height: 300px;
+  min-height: 300px;
+}
+
+.authNav {
+  display: flex;
+}
+
+.authNavItem {
+  flex: 1;
+  text-align: center;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  font-weight: 700;
+  color: #a5a5a5;
+  border-bottom: #a5a5a5 solid 2px;
+  cursor: pointer;
+}
+.authNavItem.active {
+  color: #3b82f6;
+  border-bottom: #3b82f6 solid 2px;
+}
+
+.authForms {
+  margin-top: 20px;
+
+  display: flex;
+  overflow-x: hidden;
+
+  color: #424343;
+  font-size: 0.85rem;
+}
+
+.authForm {
+  min-width: 100%;
+}
+
+.lost_password {
+  color: #b90303;
+  font-style: italic;
+  font-weight: 600;
+}
+.lost_password:hover {
+  color: #28a745;
+}
+
+.auth_error {
+  color: red;
+}
