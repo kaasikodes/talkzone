@@ -22,15 +22,17 @@ const Notifications = () => {
           Notifications
         </h4>
 
-        <div className="overflow-auto h-72 w-full">
+        <div className="overflow-auto disable-scrollbar h-72 w-full">
           {notifications?.length !== 0 ? (
             notifications?.map(({ content, id }: INotification) => (
-              <p key={id} className="mb-3">
+              <p key={id} className="mb-4 text-gray-700">
                 {content}
               </p>
             ))
           ) : (
-            <p>no notifications avail</p>
+            <p className="mb-4 text-gray-400">
+              no notifications available at the moment
+            </p>
           )}
         </div>
       </div>

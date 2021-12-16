@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+#What needs to be done to move to next stage
+What needs to be done.txt
+
 # testing
 /coverage
 

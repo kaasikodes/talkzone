@@ -80,6 +80,7 @@ const MessagesContainer = ({
       // get the collection
 
       const collectionRef = collection(db, "messages");
+      console.log("THe TRY ", user);
 
       // add doc to collection
       await addDoc(collectionRef, {
@@ -90,7 +91,7 @@ const MessagesContainer = ({
         receiverImg: currentConvoReceiverDetails.img,
         senderId: user?.id,
         senderName: user?.name,
-        senderImg: user?.photo_url,
+        senderImg: user?.photo_url || "",
         sent_on: new Date().toString(),
         viewedBy: [],
       });

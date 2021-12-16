@@ -33,10 +33,17 @@ const UserActionItems = (props: Iprops) => {
     );
 
     const queryRealTimeUpdates = onSnapshot(q, (querySnapshot) => {
-      const fetchedNotifications = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        content: doc.data().content,
-      }));
+      const fetchedNotifications = querySnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          content: doc.data().content,
+          time: doc.data().time,
+        }))
+        .sort((a, b) => {
+          let date1 = new Date(a.time);
+          let date2 = new Date(b.time);
+          return (date1 as unknown as number) - (date2 as unknown as number);
+        });
       (setNotifications as unknown as Function)(fetchedNotifications);
     });
 

@@ -34,7 +34,7 @@ const EditUserDetails = () => {
   };
   return (
     <div className=" flex items-center bg-white  mt-4 rounded-lg w-100 shadow-lg">
-      <div className="w-full overflow-hidden flex rounded-lg px-4">
+      <div className="w-full overflow-hidden flex disable-scrollbar flex-col lg:flex-row rounded-lg px-4 py-4">
         <div
           className="flex justify-center items-center"
           style={{
@@ -77,7 +77,7 @@ const EditUserDetails = () => {
         </div>
 
         <div
-          className="overflow-auto h-96 w-full  contentContainer ml-6 mr-4"
+          className="overflow-auto h-96 w-full disable-scrollbar mt-8 md:mt-0 contentContainer ml-4 mr-4"
           style={{ flex: 3 }}
         >
           <h4 className="text-3xl text-yellow-400 mt-8 mb-4 capitalize">
@@ -101,20 +101,20 @@ const EditUserDetails = () => {
                 placeholder="Your display name"
               />
             </div>
-            <div className="form-group flex flex-col mb-8 ">
-              <label htmlFor="password" className="font-semibold mr-4 mb-4">
-                Status(I'm available):
-              </label>
+            <div className="form-group flex flex-row justify-start items-center mb-8 ">
               <input
                 type="radio"
-                className=" border-0 border-b border-solid border-blue-400  flex-auto outline-none  px-3"
+                className=" border-0 border-b border-solid border-blue-400  outline-none  px-3 mr-2"
                 id="status"
                 name="status"
                 checked={status}
-                onChange={() => {
-                  setStatus(!status);
+                onClick={() => {
+                  setStatus((status) => !status);
                 }}
               />
+              <label htmlFor="password" className="font-semibold ">
+                I'm available
+              </label>
             </div>
 
             <Button content="Save" handleClick={handleSubmit} />

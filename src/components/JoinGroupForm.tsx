@@ -52,6 +52,7 @@ const JoinGroupForm = () => {
           addDoc(collection(db, "notifications"), {
             content: `${user?.name} just joined ${group.name}`,
             toWhomItMayConcern: group.members,
+            time: new Date().toString(),
           })
         );
       });

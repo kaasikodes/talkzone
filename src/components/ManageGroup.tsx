@@ -55,7 +55,7 @@ const ManageGroup = () => {
   };
   return (
     <div className=" flex items-center bg-white  mt-4 rounded-lg w-100 shadow-lg">
-      <div className="w-full overflow-hidden flex rounded-lg px-4">
+      <div className="w-full overflow-hidden flex  flex-col lg:flex-row rounded-lg px-4 py-4 w-4/5">
         <div
           className="flex justify-center items-center"
           style={{
@@ -98,7 +98,7 @@ const ManageGroup = () => {
         </div>
 
         <div
-          className="overflow-auto h-96 w-full  contentContainer ml-6 mr-6"
+          className="overflow-auto h-96 w-full mt-8 md:mt-0 contentContainer ml-6 mr-6"
           style={{ flex: 3 }}
         >
           <h4 className="text-3xl text-yellow-400 mt-2 mb-4 capitalize">

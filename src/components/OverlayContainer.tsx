@@ -96,8 +96,8 @@ const OverlayContainer = () => {
       case "edit user":
         return (
           <div
-            className=" mx-auto"
-            style={{ zIndex: 52, pointerEvents: "auto", width: "60%" }}
+            className=" mx-auto w-4/5"
+            style={{ zIndex: 52, pointerEvents: "auto" }}
           >
             <EditUserDetails />
           </div>
@@ -105,8 +105,8 @@ const OverlayContainer = () => {
       case "manage group":
         return (
           <div
-            className=" mx-auto"
-            style={{ zIndex: 52, pointerEvents: "auto", width: "60%" }}
+            className=" mx-auto w-4/5"
+            style={{ zIndex: 52, pointerEvents: "auto" }}
           >
             <ManageGroup />
           </div>
@@ -142,7 +142,7 @@ const OverlayContainer = () => {
             }}
           ></div>
           <div
-            className="click-to-close fixed w-full"
+            className="click-to-close absolute lg:fixed w-full"
             style={{
               height: "100vh",
               width: "100vw",
