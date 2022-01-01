@@ -34,12 +34,13 @@ export type conversationID = ID;
 export interface IUser {
   id: userID;
   name: string;
-  photo_url: string | null;
+  photo_url: string;
   email: string;
   groups_part_of?: groupID[];
   groups_admin_of?: groupID[];
   conversations: conversationID[];
   status: boolean;
+  bio?: string;
 }
 export interface IGroup {
   id: groupID;
@@ -57,6 +58,7 @@ export interface IGroup {
 export interface IConversation {
   id: conversationID;
   name?: string;
+
   // where the array of strings contains either a group Name 0r 2 values - participants in p-p convo
   // This is the name of either the group or either of the participant in a person -  to - person convo
 }
@@ -93,10 +95,18 @@ export interface IAction {
     photo_url?: "";
     groups_part_of?: groupID[];
     groups_admin_of?: groupID[];
+    bio?: string;
   };
 }
 
 export interface INotification {
   content: string;
   id: string;
+}
+
+export interface IConvo {
+  id: string;
+  receiverId: string;
+  receiverName: string;
+  receiverImg: string;
 }

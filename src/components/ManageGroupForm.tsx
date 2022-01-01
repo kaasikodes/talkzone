@@ -1,87 +1,138 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "./Button";
-import { GroupsContext } from "../contexts/GroupsContextProvider";
-import { UserContext } from "../contexts/UserContextProvider";
-import { getGroupsCreatedFromServer } from "../utilities/groupsUtility";
-import {
-  updateFetchingGroupsCreatedStatus,
-  fetchGroupsCreated,
-  setGroupToManageId,
-} from "../reducers/groupsReducer";
+import { persons } from "../data";
+import EntityInfo from "./EntityInfo";
+import { showSummary } from "../utilities/helpers";
 import { IGroup } from "../interfaces";
-import { OverlayContext } from "../contexts/OverlayContextProvider";
+import { useUser } from "../contexts/UserContextProvider";
+import {
+  getGroupsCreatedFromServer,
+  deleteGroupFromServer,
+} from "../utilities/groupsUtility";
+import { Link } from "react-router-dom";
+
+type groupId = string | number;
+
 const ManageGroupForm = () => {
-  const [choosen, setChoosen] = useState("");
-  const GroupsCtx = useContext(GroupsContext);
-  const state = GroupsCtx?.state;
-  const dispatch = GroupsCtx?.dispatch;
-
-  const groupsCreated = state?.groupsCreated;
-  const fetchingGroupsCreatedStatus = state?.fetchingGroupsCreatedStatus;
-  const UserCtx = useContext(UserContext);
-  const user = UserCtx?.state;
-  const OverCtx = useContext(OverlayContext);
-  const handleCompName = OverCtx?.handleCompName;
-  const userId = user?.id;
-  const handleSubmit = (id: string) => {
-    (dispatch as unknown as Function)({
-      type: setGroupToManageId,
-      payload: { id },
-    });
-    (handleCompName as unknown as Function)("manage group");
-  };
+  const { user } = useUser();
+  const [groups, setGroups] = useState<IGroup[]>([]);
   useEffect(() => {
-    (dispatch as unknown as Function)({
-      type: updateFetchingGroupsCreatedStatus,
-      payload: { status: true },
+    getGroupsCreatedFromServer(user?.id as unknown as string).then((data) => {
+      setGroups(() => data);
     });
-    getGroupsCreatedFromServer(userId as unknown as string).then((groups) => {
-      // (dispatch as unknown as Function) fetching stattus to true
-      (dispatch as unknown as Function)({
-        type: updateFetchingGroupsCreatedStatus,
-        payload: { status: false },
-      });
-      (dispatch as unknown as Function)({
-        type: fetchGroupsCreated,
-        payload: { groupsCreated: groups },
-      });
-    });
-    // .catch((err: ErrorEvent) => {});
-  }, [dispatch, userId]);
-  return (
-    <div className="form-container mt-10 w-full p-4 bg-white rounded-md">
-      <form className="">
-        <div className="form-group flex mb-8 items-end">
-          <label htmlFor="email" className="font-semibold mr-4">
-            Name of group to manage:
-          </label>
-          <select
-            className=" border-0 border-b border-solid border-blue-400  flex-auto outline-none  px-3"
-            id="group_name"
-            placeholder="eg. Robot Gurus"
-            onChange={(e) => setChoosen(e.target.value)}
-          >
-            <option selected disabled>
-              Select a group
-            </option>
-            {!fetchingGroupsCreatedStatus &&
-              groupsCreated?.map((group: IGroup) => (
-                <option
-                  key={group.id}
-                  value={group.id}
-                  selected={choosen === group.id}
-                >
-                  {group.name}
-                </option>
-              ))}
-          </select>
-        </div>
+  }, []);
+  const handleDeleteGroup = async (group: IGroup) => {
+    console.log("MY GROUP IS", group);
 
-        <Button
-          content="Manage Group"
-          handleClick={() => handleSubmit(choosen)}
-        />
-      </form>
+    if (group.creatorId === user?.id) {
+      const idToDelete = group.id;
+      await deleteGroupFromServer(idToDelete);
+
+      setGroups((groups) => groups.filter((group) => group.id !== idToDelete));
+    } else {
+      throw new Error("action not allowed!");
+    }
+  };
+  return (
+    <div className="bg-white p-8  w-full min-h-screen">
+      <div className=" flex items-center justify-between pb-6">
+        <div>
+          <h2 className="text-gray-600 font-semibold text-2xl text-blue-900 opacity-80">
+            Manage Group
+          </h2>
+        </div>
+      </div>
+      <div>
+        <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+          <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
+            <table className="min-w-full leading-normal">
+              <thead>
+                <tr>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {groups.length > 0 &&
+                  groups.map((group) => (
+                    <tr key={group.id}>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          {group.name}
+                        </p>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          {showSummary(
+                            group.description ? group.description : ""
+                          )}
+                        </p>
+                      </td>
+
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <Link
+                          to={`/dashboard/view/group/${group.id}`}
+                          className="relative outline-none inline-block px-3 py-1 font-semibold text-white leading-tight"
+                        >
+                          <span
+                            aria-hidden
+                            className="absolute inset-0 bg-blue-700  rounded-full"
+                          ></span>
+                          <span className="relative">View</span>
+                        </Link>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <Link
+                          to={`/dashboard/edit/group/${group.id}`}
+                          className="relative outline-none inline-block px-3 py-1 font-semibold text-white leading-tight"
+                        >
+                          <span
+                            aria-hidden
+                            className="absolute inset-0 bg-green-600  rounded-full"
+                          ></span>
+                          <span className="relative">Edit</span>
+                        </Link>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <button
+                          onClick={() => handleDeleteGroup(group)}
+                          className="relative outline-none inline-block px-3 py-1 font-semibold text-white leading-tight"
+                        >
+                          <span
+                            aria-hidden
+                            className="absolute inset-0 bg-red-600  rounded-full"
+                          ></span>
+                          <span className="relative">Delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            {/* <div className="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between   displ       ">
+              <span className="text-xs xs:text-sm text-gray-900">
+                Showing 1 to 4 of 50 Entries
+              </span>
+              <div className="inline-flex mt-2 xs:mt-0">
+                <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-l">
+                  Prev
+                </button>
+                &nbsp; &nbsp;
+                <button className="text-sm text-indigo-50 transition duration-150 hover:bg-indigo-500 bg-indigo-600 font-semibold py-2 px-4 rounded-r">
+                  Next
+                </button>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

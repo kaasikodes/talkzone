@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { auth } from "../fbconfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -9,7 +9,9 @@ const LogIn = () => {
   const [pwd, setPwd] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // move to user Utility
     signInWithEmailAndPassword(auth, email, pwd)
       .then((userCred) => {
         // Signed in
@@ -21,43 +23,42 @@ const LogIn = () => {
   };
   return (
     <>
-      <motion.div
-        className="authform w-full login_form"
-        initial={{ x: "-200" }}
-        animate={{ x: 0 }}
-        transition={{ type: "tween", ease: "easeOut" }}
-      >
+      <div className="authform w-full login_form">
+        <h2 className="text-center text-blue-900 mb-6 text-2xl font-semibold uppercase">
+          Login
+        </h2>
         <small className="auth_error">{errorMessage}</small>
-        <form className="mb-3">
-          <div className="form-group flex mb-3">
-            <label htmlFor="email" className="font-semibold capitalize">
-              Email address:
-            </label>
+        <form className="flex flex-col items-stretch" onSubmit={handleSubmit}>
+          <div className="form-group flex flex-col mb-3">
+            <label className="text-yellow-500 text-xs">Email</label>
             <input
               type="email"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="email"
+              placeholder="email"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="form-group flex mb-3">
-            <label htmlFor="pwd" className="font-semibold capitalize">
-              password:
-            </label>
+          <div className="form-group flex flex-col mb-8">
+            <label className="text-yellow-500 text-xs">Password</label>
             <input
               type="password"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="password"
+              placeholder="password"
               onChange={(e) => setPwd(e.target.value)}
             />
           </div>
-          <Button content="Log In" handleClick={handleSubmit} />
+          <Button
+            content="Log In"
+            handleClick={() => console.log("correct form mistake")}
+          />
         </form>
 
         {/* <a href="/" target="_blank" className="lost_password">
           Lost your Password?
         </a> */}
-      </motion.div>
+      </div>
     </>
   );
 };

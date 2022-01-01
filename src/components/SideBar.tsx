@@ -24,7 +24,6 @@ const SideBar = () => {
             setComponentName={handleCompName as unknown as Function}
           />
           {/* Actions Items - 2 */}
-          <CurrentConversations />
         </div>
       </div>
     </div>

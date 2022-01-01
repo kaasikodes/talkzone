@@ -1,8 +1,6 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { AiOutlineSend as SendBtn } from "react-icons/ai";
 import { db } from "../fbconfig";
-import { MessagesContext } from "../contexts/MessagesContextProvider";
-import { fetchMessagesForConversation } from "../reducers/messagesReducer";
 
 import Message from "./Message";
 // import { IMessage } from "../interfaces";
@@ -33,10 +31,6 @@ const MessagesContainer = ({
 }: MesssageConProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<IMessage[] | []>([]);
-  const MsgCtx = useContext(MessagesContext);
-  const MessagesState = MsgCtx?.state;
-  const dispatch = MsgCtx?.dispatch;
-  const filteredMessages = MessagesState?.filteredMessages;
 
   useEffect(() => {
     // set listener for messages on particular conversation document id
@@ -60,18 +54,13 @@ const MessagesContainer = ({
       });
 
       setMessages(fetchedMessages);
-
-      (dispatch as unknown as Function)({
-        type: fetchMessagesForConversation,
-        payload: { messages: fetchedMessages },
-      });
     });
     window.scrollTo(0, window.innerHeight);
 
     return () => {
       queryRealTimeUpdates();
     };
-  }, [conversationId, dispatch]);
+  }, [conversationId]);
   const [message, setMessage] = useState("");
   const UserCtx = useContext(UserContext);
   const user = UserCtx?.state;
@@ -112,8 +101,8 @@ const MessagesContainer = ({
     <div className="relative">
       <div className="w-full flex relative flex-col py-4 px-4">
         <div className="messages-section">
-          {filteredMessages?.length !== 0 ? (
-            filteredMessages?.map((message) => (
+          {messages?.length !== 0 ? (
+            messages?.map((message) => (
               <Message key={message.id} {...message} />
             ))
           ) : (
@@ -149,36 +138,6 @@ const MessagesContainer = ({
       </div>
     </div>
   );
-
-  // return (
-  //   <>
-  //     <div className="w-full flex relative flex-col py-4 px-4">
-  //       <div className="messages-section">
-  //         {messages.length !== 0 &&
-  //           messages.map((message) => (
-  //             <Message key={message.id} {...message} />
-  //           ))}
-  //       </div>
-  //     </div>
-  //     <div className="relative">
-  //       <div
-  //         className="input-section flex w-full fixed items-center self-center bg-gray-100"
-  //         style={{ bottom: "8vh", maxWidth: "76vw", minWidth: "55vw" }}
-  //       >
-  //         <input
-  //           placeholder="Type Mesaage"
-  //           className="outline-none shadow-sm bg-white flex-1 px-3 py-2 rounded-lg mr-2"
-  //           value={message}
-  //           onChange={(e) => setMessage(e.target.value)}
-  //         />
-  //         <SendBtn
-  //           className="text-blue-700 text-xl"
-  //           onClick={() => handleClick(message)}
-  //         />
-  //       </div>
-  //     </div>
-  //   </>
-  // );
 };
 
 export default MessagesContainer;

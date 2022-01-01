@@ -1,28 +1,32 @@
-import React, { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { auth } from "./fbconfig";
-import { onAuthStateChanged } from "@firebase/auth";
-
+import Home from "./pages/Home";
+import SignUp from "./broughtInComponents/SignUp";
+import LogIn from "./broughtInComponents/LogIn";
+import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
-
-import "./App.css";
-import Authentication from "./pages/Authentication";
-import OverlayContextProvider from "./contexts/OverlayContextProvider";
-
-import PersonsContextProvider from "./contexts/PersonsContextProvider";
-import MessagesContextProvider from "./contexts/MessagesContextProvider";
-import GroupsContextProvider from "./contexts/GroupsContextProvider";
+import ConversationStarter from "./components/ConversationStarter";
+import CreateGroupForm from "./components/CreateGroupForm";
+import EditUserDetails from "./components/EditUserDetails";
+import JoinGroupForm from "./components/JoinGroupForm";
+import LeaveGroupForm from "./components/LeaveGroupForm";
+import ManageGroupForm from "./components/ManageGroupForm";
+import Notifications from "./components/Notifications";
 
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./fbconfig";
-import { UserContext, initUser } from "./contexts/UserContextProvider";
-import NotificationsContextProvider from "./contexts/NotificationsContextProvider";
-import ConversationsContextProvider from "./contexts/ConversationsContextProvider";
+import { auth } from "./fbconfig";
+import { onAuthStateChanged } from "@firebase/auth";
+import { useUser, removeUser, initUser } from "./contexts/UserContextProvider";
 
-function App() {
-  const UserCtx = useContext(UserContext);
-  const dispatch = UserCtx?.dispatch;
+import MessageComposer from "./components/MessageComposer";
+import ViewProfile from "./components/ViewProfile";
+import EditGroupContainer from "./components/EditGroupContainer";
+import ViewGroupContainer from "./components/ViewGroupContainer";
+
+const App = () => {
   const navigate = useNavigate();
+  const { dispatch } = useUser();
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -40,60 +44,61 @@ function App() {
                 "groups admin of": fetchedData.groups_admin_of,
                 "groups part of": fetchedData.groups_part_of,
                 name: fetchedData.displayName,
-                "photo url": fetchedData.photo_url,
+                photo_url: fetchedData.photo_url,
+                bio: fetchedData.bio,
               };
-              console.log("DATA", data);
+              // put user context in globally available space
               (dispatch as unknown as Function)({
                 type: initUser,
-                payload: data,
+                payload: { ...data },
               });
+
+              navigate("dashboard");
             }
           })
-          .catch((err) => console.log("E B Y", err.message));
-        navigate("/");
+          .catch((err) => {
+            console.log("E B Y", err.message);
+            navigate("/"); //temporary
+          });
       } else {
-        console.log("user prolm not signed in");
-        navigate("/auth");
+        (dispatch as unknown as Function)({
+          type: removeUser,
+        });
+
+        navigate("/"); // temporary
       }
 
       return () => {
         unSubscribe();
       };
     });
-  }, [navigate, dispatch]);
+  }, []);
   return (
-    <div>
-      <OverlayContextProvider>
-        <NotificationsContextProvider>
-          <PersonsContextProvider>
-            <GroupsContextProvider>
-              <ConversationsContextProvider>
-                <MessagesContextProvider>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
+    <>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route path="/" element={<Welcome />} />
+          <Route path="signup" element={<SignUp />} />
+          <Route path="login" element={<LogIn />} />
+        </Route>
+        <Route path="dashboard" element={<Dashboard />}>
+          <Route path="edit/user" element={<EditUserDetails />} />
+          <Route path="edit/group/:id" element={<EditGroupContainer />} />
+          <Route path="view/group/:id" element={<ViewGroupContainer />} />
+          <Route path="view/user" element={<ViewProfile />} />
+          <Route path="start_conversation" element={<ConversationStarter />} />
+          <Route path="create_group" element={<CreateGroupForm />} />
+          <Route path="leave_group" element={<LeaveGroupForm />} />
+          <Route path="join_group" element={<JoinGroupForm />} />
+          <Route path="manage_group" element={<ManageGroupForm />} />
+          <Route path="notifications" element={<Notifications />} />
 
-                    <Route path="auth" element={<Authentication />} />
-                  </Routes>
-                </MessagesContextProvider>
-              </ConversationsContextProvider>
-            </GroupsContextProvider>
-          </PersonsContextProvider>
-        </NotificationsContextProvider>
-      </OverlayContextProvider>
-
-      {/* Create read later code */}
-      {/* App Main Interface - set up tailwind, typescript  DONE*/}
-      {/* App Dry Components with dummy data */}
-      {/* Add app functionality with fb */}
-      {/* Add test cases */}
-      {/* Clean up every */}
-      {/* Add Load page */}
-      {/* Add neccessary branding */}
-      {/* Add to portfolio n describe accordingly in sept comp  .... 4 l8r*/}
-      {/* Deploy site */}
-      {/* Next e commerce using Next Js n typescript n pref material ui */}
-    </div>
+          {/* deeper within */}
+          <Route path="conversations/:slug" element={<MessageComposer />} />
+        </Route>
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;

@@ -26,7 +26,9 @@ const SignUp = () => {
     }
   }, [confirmRegisterPwd, registerPwd]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // TO DO - MOVE TO UTILITY
     if (verifyPassword()) {
       createUserWithEmailAndPassword(auth, email, registerPwd)
         .then((userCredential) => {
@@ -61,62 +63,59 @@ const SignUp = () => {
   }, [verifyPassword]);
   return (
     <>
-      <motion.div
-        className="authform w-full register_form"
-        initial={{ x: "200" }}
-        animate={{ x: 0 }}
-        transition={{ type: "tween", ease: "easeIn" }}
-      >
+      <div className="authform w-full register_form">
+        <h2 className="text-center text-blue-900 mb-6 text-2xl font-semibold uppercase">
+          Sign Up
+        </h2>
         <small className="auth_error">{registerError}</small>
-        <form className="">
-          <div className="form-group flex mb-3">
-            <label htmlFor="user_name" className="font-semibold capitalize">
-              User name:
-            </label>
+        <form className="flex flex-col items-stretch" onSubmit={handleSubmit}>
+          <div className="form-group flex flex-col mb-3">
+            <label className="text-yellow-500 text-xs">User Name</label>
             <input
+              placeholder="user name"
               type="text"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="user_name"
               onChange={(e) => setName(e.target.value)}
             />
           </div>
-          <div className="form-group flex mb-3">
-            <label htmlFor="email" className="font-semibold capitalize">
-              Email address:
-            </label>
+          <div className="form-group flex flex-col mb-3">
+            <label className="text-yellow-500 text-xs">Email</label>
             <input
               type="email"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="email"
+              placeholder="email"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="form-group flex mb-3">
-            <label htmlFor="pwd" className="font-semibold capitalize">
-              password:
-            </label>
+          <div className="form-group flex flex-col mb-3">
+            <label className="text-yellow-500 text-xs">Password</label>
             <input
               type="password"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="password"
+              placeholder="password"
               onChange={(e) => setRegisterPwd(e.target.value)}
             />
           </div>
-          <div className="form-group flex mb-3">
-            <label htmlFor="confirm_pwd" className="font-semibold capitalize">
-              Retype Password:
-            </label>
+          <div className="form-group flex flex-col mb-8">
+            <label className="text-yellow-500 text-xs">Confirm Password</label>
             <input
               type="password"
-              className="border border-b border-solid border-blue-400 rounded-md ml-3 flex-auto outline-none py-1 px-3"
+              className="border-0 border-b border-blue-400 flex-auto outline-none py-1 px-3"
               id="confirm_pwd"
+              placeholder="confirm password"
               onChange={(e) => setConfirmRegisterPwd(e.target.value)}
             />
           </div>
 
-          <Button content="sign up" handleClick={handleSubmit} />
+          <Button
+            content="sign up"
+            handleClick={() => console.log("correct form mistake")}
+          />
         </form>
-      </motion.div>
+      </div>
     </>
   );
 };

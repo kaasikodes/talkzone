@@ -1,42 +1,57 @@
-import ChiImg from "../images/wom.jpg";
+import NoImg from "../images/wom.jpg";
+
 import Button from "./Button";
-import { FaEdit } from "react-icons/fa";
-import { UserContext, initUser } from "../contexts/UserContextProvider";
-import { useContext, useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../fbconfig";
-import { OverlayContext } from "../contexts/OverlayContextProvider";
+import { FaEdit, FaTimes } from "react-icons/fa";
+import { useUser, initUser } from "../contexts/UserContextProvider";
+import React, { useState, useRef } from "react";
+import { editUserInServer } from "../utilities/userUtility";
 
 const EditUserDetails = () => {
-  const UserCtx = useContext(UserContext);
-  const user = UserCtx?.state;
-  const dispatch = UserCtx?.dispatch;
-  const OverCtx = useContext(OverlayContext);
-  const handleCompName = OverCtx?.handleCompName;
+  const { user, dispatch } = useUser();
   const [name, setName] = useState(user?.name);
-  const [status, setStatus] = useState(false);
-  const handleSubmit = async () => {
-    const docRef = doc(db, "users", user?.id as unknown as string);
+  const [bio, setBio] = useState(user?.bio);
+  const [photoUrl, setPhotoUrl] = useState(user?.photo_url);
+  const [progress, setProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<any>(null);
 
-    // Set the "capital" field of the city 'DC'
-    await updateDoc(docRef, {
-      displayName: name,
-      status,
-    });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileInputClick = () => {
+    if (fileInputRef.current !== null) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const file = !!selectedFile ? selectedFile[0] : null;
+    !!file && console.log(file);
+
+    await editUserInServer(
+      name as unknown as string,
+      bio as unknown as string,
+
+      user?.id as unknown as string,
+      file,
+      setProgress,
+      setPhotoUrl
+    );
+
     (dispatch as unknown as Function)({
       type: initUser,
-      data: { ...user, name, status },
+      payload: { ...user, name, bio, photo_url: photoUrl },
     });
-    setStatus(false);
+    setBio("");
     setName("");
-
-    (handleCompName as unknown as Function)("");
+    setSelectedFile(null);
   };
   return (
-    <div className=" flex items-center bg-white  mt-4 rounded-lg w-100 shadow-lg">
-      <div className="w-full overflow-hidden flex disable-scrollbar flex-col lg:flex-row rounded-lg px-4 py-4">
+    <div className=" flex items-center bg-white  my-4 mx-4 rounded-lg w-100 shadow-lg">
+      <form
+        className="w-full overflow-hidden flex disable-scrollbar flex-col lg:flex-row rounded-lg px-4 py-4"
+        onSubmit={handleSubmit}
+      >
         <div
-          className="flex justify-center items-center"
+          className="flex justify-center items-center flex-col"
           style={{
             flex: 2,
             position: "relative",
@@ -52,7 +67,7 @@ const EditUserDetails = () => {
             }}
           >
             <img
-              src={ChiImg}
+              src={photoUrl !== "" ? photoUrl : NoImg}
               alt="creator"
               className=""
               style={{
@@ -72,7 +87,27 @@ const EditUserDetails = () => {
                 top: "290px",
                 left: "238px",
               }}
+              onClick={handleFileInputClick}
             />
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              onChange={(e) =>
+                e.target.files && e.target.files.length > 0
+                  ? setSelectedFile(() => e.target.files)
+                  : null
+              }
+            />
+          </div>
+
+          <div className="h-6 w-full mb-2 mt-12">
+            {progress > 0 && (
+              <div className="flex justify-between items-center  h-full w-full">
+                <p className=""> Progress {progress}%</p>
+                <FaTimes onClick={() => setProgress(() => 0)} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -84,7 +119,7 @@ const EditUserDetails = () => {
             Change your details
           </h4>
 
-          <form className="mt-8 w-full">
+          <div className="mt-8 w-full">
             <div className="form-group flex mb-8 flex-col ">
               <label htmlFor="user_name" className="font-semibold mr-4 mb-4">
                 User Name:
@@ -101,31 +136,35 @@ const EditUserDetails = () => {
                 placeholder="Your display name"
               />
             </div>
-            <div className="form-group flex flex-row justify-start items-center mb-8 ">
-              <input
-                type="radio"
-                className=" border-0 border-b border-solid border-blue-400  outline-none  px-3 mr-2"
-                id="status"
-                name="status"
-                checked={status}
-                onClick={() => {
-                  setStatus((status) => !status);
-                }}
-              />
-              <label htmlFor="password" className="font-semibold ">
-                I'm available
+            <div className="form-group flex flex-col mb-8 ">
+              <label htmlFor="bio" className="font-semibold mb-2">
+                Bio:
               </label>
+              <textarea
+                className=" border border-solid border-blue-400  flex-auto outline-none  px-3"
+                id="bio"
+                name="bio"
+                value={bio}
+                onChange={(e) => {
+                  setBio(e.target.value);
+                }}
+                placeholder="Descibe yourself"
+              />
             </div>
 
-            <Button content="Save" handleClick={handleSubmit} />
-          </form>
+            <Button
+              content="Save"
+              type="submit"
+              handleClick={() => console.log("fix it")}
+            />
+          </div>
 
           {/* STEPS TO BE TAKEN */}
           {/* user image */}
           {/* change password */}
           {/* A user name */}
         </div>
-      </div>
+      </form>
     </div>
   );
 };

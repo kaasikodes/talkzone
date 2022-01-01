@@ -30,7 +30,6 @@ const MobileMenu = () => {
         setComponentName={handleCompName as unknown as Function}
       />
       {/* Actions Items - 2 */}
-      <CurrentConversations />
     </div>
   );
 };

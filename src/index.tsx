@@ -5,12 +5,15 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import UserContextProvider from "./contexts/UserContextProvider";
+import ConversationsContextProvider from "./contexts/ConversationsContextProvider";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <UserContextProvider>
-        <App />
+        <ConversationsContextProvider>
+          <App />
+        </ConversationsContextProvider>
       </UserContextProvider>
     </BrowserRouter>
   </React.StrictMode>,
